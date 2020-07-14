@@ -36,6 +36,9 @@ server.on("request", (req, res) => {
     // res.end(res.statusCode);
   }
   if (res.statusCode !== 404) {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/plain");
+
     const users = require(filePath);
     const clone = JSON.parse(JSON.stringify(users));
     let filtered_users = clone.filter((item) => {
@@ -57,25 +60,34 @@ server.on("request", (req, res) => {
     console.log(readable.readableFlowing); // null
     // flowing mode - no buffering - can float the memory
     // listening to 'data' event calls _read() that will fill the buffer
-    /* readable.on("data", (chunk) => {
-    // console.log(chunk);
-    // res.end(chunk);
-  }); */
+    readable.on("data", (chunk) => {
+      // console.log(chunk);
+      //res.statusCode = 200;
+      //res.setHeader("Content-Type", "text/json");
+      res.write(JSON.stringify(chunk));
+    });
     console.log(readable.readableFlowing); // true
     // pause mode
     let data = [];
+    let data_str = "";
     readable.on("readable", () => {
       data = readable.read(); // calls _read(), flushes the buffer and emits 'data' event
       // console.log(data);
+      // data_str = JSON.stringify(data);
+      // res.end(data_str);
     });
     console.log(readable.readableFlowing); // false
 
-    readable.on("end", () => console.log("No more data!"));
-    /* res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("Hello World"); */
-    const { headers, method, url } = req;
-    let body = data;
+    readable.on("end", () => {
+      console.log("No more data!");
+
+      setTimeout(() => {
+        res.end();
+      }, 0);
+      // console.log(data_str);
+    });
+    /* const { headers, method, url } = req;
+    let body = [];
     req
       .on("error", (err) => {
         console.error(err);
@@ -95,15 +107,15 @@ server.on("request", (req, res) => {
         res.setHeader("X-Powered-By", "bacon");
         res.statusCode = 200;
         // res.write(body);
-        /* res.write("<html>");
-      res.write("<body>");
-      res.write(body);
-      res.write("<h1>------------->Hello, World!</h1>");
-      res.write("</body>");
-      res.write("</html>"); */
+        res.write("<html>");
+        res.write("<body>");
+        res.write(body);
+        res.write("<h1>------------->Hello, World!</h1>");
+        res.write("</body>");
+        res.write("</html>");
         res.write(JSON.stringify(responseBody));
         res.end();
-      });
+      }); */
   } else {
     res.end();
   }
