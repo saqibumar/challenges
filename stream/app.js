@@ -29,16 +29,15 @@ server.on("request", (req, res) => {
     req.url.indexOf("/api/v1/users?masking=") !== -1
   ) {
     console.log("Correct method called");
-    //req.pipe(res);
+    // req.pipe(res);
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/json");
   } else {
     console.log("404");
     res.statusCode = 404;
     // res.end(res.statusCode);
   }
   if (res.statusCode !== 404) {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-
     const users = require(filePath);
     const clone = JSON.parse(JSON.stringify(users));
     let filtered_users = clone.filter((item) => {
@@ -68,10 +67,10 @@ server.on("request", (req, res) => {
     });
     console.log(readable.readableFlowing); // true
     // pause mode
-    let data = [];
-    let data_str = "";
+    // let data = [];
+    // let data_str = "";
     readable.on("readable", () => {
-      data = readable.read(); // calls _read(), flushes the buffer and emits 'data' event
+      readable.read(); // calls _read(), flushes the buffer and emits 'data' event
       // console.log(data);
       // data_str = JSON.stringify(data);
       // res.end(data_str);
@@ -81,9 +80,9 @@ server.on("request", (req, res) => {
     readable.on("end", () => {
       console.log("No more data!");
 
-      setTimeout(() => {
-        res.end();
-      }, 0);
+      // setTimeout(() => {
+      res.end();
+      // }, 0);
       // console.log(data_str);
     });
     /* const { headers, method, url } = req;
